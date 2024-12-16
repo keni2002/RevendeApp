@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5 bg-body-tertiary">
+        <div class="card-body text-center">
+            <h1 class="card-title mb-4">Welcome, {{new_user.first_name | default:new_user.username}}!</h1>
+            <p class="card-text mb-4">
+                Your account has been successfully created. Now you can:
+            </p>
+            <a href="{% url 'login' %}" class="btn btn-primary">Go to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

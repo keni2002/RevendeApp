@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Logged Out{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm" style="max-width: 500px; margin: auto;">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Logged out</h5>
+                    <p class="card-text">
+                        You have been successfully logged out.
+                    </p>
+                    <p class="card-text">
+                        You can <a href="{% url 'login' %}" class="text-decoration-none text-primary">log in again</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

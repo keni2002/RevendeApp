@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Log In{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 24rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Log In</h5>
+            <p class="text-center small">
+                If you don't have an account <a href="{% url 'register' %}">register here</a>.
+            </p>
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                {% if form.non_field_errors %} 
+                <div class="alert alert-danger">
+                     {% for error in form.non_field_errors %}
+                      <p>{{ error }}</p> 
+                      {% endfor %}
+                </div> {% endif %}
+                
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="id_username" name="username">
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="id_password" name="password">
+                    {% if form.password.errors %}
+                        <div class="text-danger">
+                            {{ form.password.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <input type="hidden" name="next" value="{{ next }}"/>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </div>
+            </form>
+            <p class="text-center small mt-3">
+                <a href="{% url 'password_reset' %}">Forgotten your password?</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

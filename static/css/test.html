@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load i18n %}  <!-- Para pluralize -->
+{% load static %}
+
+{% block content %}
+<style>
+    .actions-column {
+        width: 200px;  /* Ajusta este valor según sea necesario */
+    }
+    .expected-profit-column {
+        background-color: #e7f3ff;  /* Color de fondo suave azul */
+    }
+    .sortable:hover {
+        cursor: pointer;
+    }
+</style>
+<div class="container mt-5">
+    <h2>Product List</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable(0)">Name <span id="name-sort" class="float-right"></span></th>
+                <th>Categories</th>
+                <th class="sortable" onclick="sortTable(2)">Price <span id="price-sort" class="float-right"></span></th>
+                <th class="sortable" onclick="sortTable(3)">High Price <span id="high-price-sort" class="float-right"></span></th>
+                <th class="sortable" onclick="sortTable(4)">Quantity <span id="quantity-sort" class="float-right"></span></th>
+                <th class="sortable" onclick="sortTable(5)">Currency <span id="currency-sort" class="float-right"></span></th>
+                <th class="sortable expected-profit-column" onclick="sortTable(6)">Expected Profit <span id="profit-sort" class="float-right"></span></th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th class="actions-column">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td><a href="#">{{ product.name }}</a></td>
+                <td>
+                    {% for category in product.categories.all %}
+                        <a href="#">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ product.price }} {{ product.currency }}</td>
+                <td>{{ product.high_price }} {{ product.currency }}</td>
+                <td>{{ product.quantity|pluralize }}</td>
+                <td>{{ product.get_currency_display }}</td>
+                <td class="expected-profit-column">{{ product.expected_profit }} {{ product.currency }}</td>
+                <td>{{ product.created }}</td>
+                <td>{{ product.updated }}</td>
+                <td class="actions-column">
+                    <a href="#" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                    <a href="#" class="btn btn-secondary btn-sm">Resell</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación e Items por Página -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if products.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.previous_page_number }}&items_per_page={{ items_per_page }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > products.number|add:'-5' and num < products.number|add:'5' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}&items_per_page={{ items_per_page }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if products.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ products.next_page_number }}&items_per_page={{ items_per_page }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+        <!-- Formulario de Selección de Items por Página y Entrada de Página -->
+        <div class="d-flex justify-content-center mt-2">
+            <form method="get" class="form-inline">
+                <input type="hidden" name="page" value="{{ products.number }}">
+                <label for="items_per_page" class="mr-2">Items per page:</label>
+                <select name="items_per_page" id="items_per_page" class="form-control form-control-sm mr-2">
+                    <option value="6" {% if items_per_page|default:"12" == "6" %}selected{% endif %}>6</option>
+                    <option value="12" {% if items_per_page|default:"12" == "12" %}selected{% endif %}>12</option>
+                    <option value="24" {% if items_per_page|default:"12" == "24" %}selected{% endif %}>24</option>
+                    <option value="48" {% if items_per_page|default:"12" == "48" %}selected{% endif %}>48</option>
+                </select>
+                <input type="number" name="page" id="page_number" class="form-control form-control-sm ml-2" min="1" max="{{ products.paginator.num_pages }}" value="{{ products.number }}">
+            </form>
+        </div>
+    </nav>
+</div>
+
+<script>
+function sortTable(columnIndex) {
+    var table, rows, switching, i, x, y, shouldSwitch, direction, switchcount = 0;
+    table = document.querySelector(".table");
+    switching = true;
+    direction = "asc"; // Set the sorting direction to ascending:
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[columnIndex];
+            y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+            if (direction == "asc") {
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (direction == "desc") {
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+        } else {
+            if (switchcount == 0 && direction == "asc") {
+                direction = "desc";
+                switching = true;
+            }
+        }
+    }
+    updateSortIcons(columnIndex, direction);
+}
+
+function updateSortIcons(columnIndex, direction) {
+    var columns = document.querySelectorAll("th span");
+    columns.forEach(function(span) {
+        span.innerHTML = "";
+    });
+    var selectedColumn = columns[columnIndex];
+    selectedColumn.innerHTML = direction === "asc" ? "↑" : "↓";
+}
+</script>
+{% endblock content %}
