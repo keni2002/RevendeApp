@@ -15,7 +15,7 @@ from django.db.models import Q
 @login_required
 def customer_list(request):
     query = request.GET.get('q', '')
-    customer_list = Customer.objects.all()
+    customer_list = Customer.objects.filter(user=request.user)
 
     if query:
         customer_list = customer_list.filter(
@@ -69,6 +69,10 @@ class CustomerCreateView(SuccessMessageMixin, CreateView):
     template_name = 'customers/customer_form.html'
     success_url = reverse_lazy('customer:customer_list')
     success_message = "Customer wa  s created successfully!"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, "There was an error creating the customer. Please try again.")
