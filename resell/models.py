@@ -17,7 +17,7 @@ class Product(models.Model):
     sold_quantity = models.PositiveIntegerField(default=0)
     currency = models.CharField(max_length=10, choices=Status.choices, default=Status.CUP)
     unit = models.CharField(max_length=50,default='unit')
-    categories = TaggableManager()
+    categories = TaggableManager(verbose_name='Categories', blank=True)
     #time
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -113,3 +113,25 @@ class ProductCreateView(LoginRequiredMixin,SuccessMessageMixin, CreateView):
         messages.error(self.request, "There was an error creating the product. Please try again.")
         return super().form_invalid(form)
 
+
+class ProductUpdateView(SuccessMessageMixin, UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'products/product_edit.html'
+    success_url = reverse_lazy('resell:products')
+    success_message = "Product was updated successfully!"
+
+    def form_valid(self, form):
+        form.instance.retailer = self.request.user
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "There was an error updating the product. Please try again.")
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = self.object.categories.all()
+        context['formatted_categories'] = ', '.join([tag.name for tag in categories])
+        return context
+
