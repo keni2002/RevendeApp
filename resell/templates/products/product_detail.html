@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Product Details{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ product.get_currency_display }}</h6>
+            <p class="card-text">Price: {{ product.price }} {{ product.currency }}</p>
+            <p class="card-text">High Price: {{ product.high_price }} {{ product.currency }}</p>
+            <p class="card-text">Quantity: {{ product.quantity }} {{ product.unit }}{{ product.quantity|pluralize }}</p>
+            <p class="card-text">Investment(inversión): {{ product.investment|floatformat:2 }} {{ product.currency }}</p>
+            <p class="card-text">Profit So Far(lo que se ha ganado): {{ product.profit_so_far|floatformat:2 }} {{ product.currency }}</p>
+            <p class="card-text">Potential Profit(lo que se espera ganar): {{ product.potential_profit|floatformat:2 }} {{ product.currency }}</p>
+            <p class="card-text">Sold Quantity(lo que se ha vendido): {{ product.sold_quantity }} {{ product.unit }}{{ product.sold_quantity|pluralize }}</p>
+            <p class="card-text">Remaining Stock(lo que queda): {{ product.remaining_stock }} {{ product.unit }}{{ product.remaining_stock|pluralize }}</p>
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" style="width: {{ product.progress_percent }}%;" aria-valuenow="{{ product.progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                    {{ product.progress_percent|floatformat:2 }}%
+                </div>
+            </div>
+            <p class="card-text">Categories:
+                {% for category in product.categories.all %}
+                    <span class="badge bg-primary">{{ category.name }}</span>
+                {% endfor %}
+            </p>
+            
+
+            <a href="#" class="btn btn-primary">Resell</a>
+            <a href="{% url 'resell:products' %}" class="btn btn-secondary">Back</a>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

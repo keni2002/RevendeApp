@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Create Product{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 24rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Create Product</h5>
+            <form method="post">
+                {% csrf_token %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="id_name" name="name" value="{{ form.name.value|default:'' }}">
+                    {% if form.name.errors %}
+                        <div class="text-danger">
+                            {{ form.name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_price" class="form-label">Price</label>
+                    <input type="number" step="0.01" class="form-control" id="id_price" name="price" value="{{ form.price.value|default:'' }}">
+                    {% if form.price.errors %}
+                        <div class="text-danger">
+                            {{ form.price.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_high_price" class="form-label">High Price</label>
+                    <input type="number" step="0.01" class="form-control" id="id_high_price" name="high_price" value="{{ form.high_price.value|default:'' }}">
+                    {% if form.high_price.errors %}
+                        <div class="text-danger">
+                            {{ form.high_price.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_quantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="id_quantity" name="quantity" value="{{ form.quantity.value|default:'' }}">
+                    {% if form.quantity.errors %}
+                        <div class="text-danger">
+                            {{ form.quantity.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_currency" class="form-label">Currency</label>
+                    <select class="form-select" id="id_currency" name="currency">
+                        {% for choice in form.currency.field.choices %}
+                            <option value="{{ choice.0 }}" {% if form.currency.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if form.currency.errors %}
+                        <div class="text-danger">
+                            {{ form.currency.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_unit" class="form-label">Unit</label>
+                    <input type="text" class="form-control" id="id_unit" name="unit" value="{{ form.unit.value|default:'unit' }}">
+                    {% if form.unit.errors %}
+                        <div class="text-danger">
+                            {{ form.unit.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_categories" class="form-label">Categories</label>
+                    <input type="text" class="form-control" id="id_categories" name="categories" value="{{ form.categories.value|default:'' }}" placeholder="Separated by comma">
+                    {% if form.categories.errors %}
+                        <div class="text-danger">
+                            {{ form.categories.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Create Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

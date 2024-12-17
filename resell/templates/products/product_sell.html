@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Sell Product{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 36rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Sell Product</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity to Sell</label>
+                    {{ form.quantity }}
+                    <small class="form-text text-muted">Available stock: {{ remaining_stock }} {{ product.unit }}{{ remaining_stock|pluralize }}</small>
+                </div>
+                <div class="mb-3">
+                    <label for="customer" class="form-label">Customer</label>
+                    <div class="d-flex">
+                        {{ form.customer }}
+                        <a href="{% url 'resales:customer_add' %}" class="btn btn-success btn-sm ms-2">
+                            <i class="bi bi-plus"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Sell</button>
+                </div>
+            </form>
+            <div class="d-grid gap-2 mt-3">
+                <a href="{% url 'resales:products' %}" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

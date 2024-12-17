@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Add Customer{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 36rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Add Customer</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    {{ form.email }}
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone</label>
+                    {{ form.phone }}
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    {{ form.address }}
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Add Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

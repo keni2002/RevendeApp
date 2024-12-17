@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product{% endblock title %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start vh-100">
+    <div class="card shadow-sm mt-5" style="width: 36rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Edit Product</h5>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% if field.name != 'existing_categories' and field.name != 'new_categories' %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="text-danger">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Existing Categories</label>
+                    <div class="form-check">
+                        {% for checkbox in form.existing_categories %}
+                            <div class="form-check">
+                                {{ checkbox.tag }}
+                                <label class="form-check-label">{{ checkbox.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_new_categories" class="form-label">New Categories</label>
+                    {{ form.new_categories }}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+    .form-check-label {
+        margin-left: 0.25rem;
+    }
+</style>
+
+{% endblock content %}
