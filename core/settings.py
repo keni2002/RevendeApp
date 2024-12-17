@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'product.apps.ProductConfig',
     'customer.apps.CustomerConfig',
+    'sale.apps.SaleConfig',
     'taggit'
 ]
 
