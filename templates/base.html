@@ -1,11 +1,10 @@
 {% load static %}
+{# Load the tag library #}
 {% load django_bootstrap5 %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
 
 
 <!DOCTYPE html>
@@ -17,6 +16,7 @@
     </head>
     <body>
         {% include "navbar.html" %}
+        {# Display django.contrib.messages as Bootstrap alerts #}
         {% bootstrap_messages %}
   
     </div>
