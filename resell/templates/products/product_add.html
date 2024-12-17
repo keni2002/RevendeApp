@@ -6,9 +6,32 @@
 <div class="container d-flex justify-content-center align-items-start vh-100">
     <div class="card shadow-sm mt-5" style="width: 24rem;">
         <div class="card-body">
+        <div class="flex-row justify-content-between ">
+            <a href="{% url "resell:products" %}">
+            <button type="button" class="btn btn-light">
+                <i class="bi bi-arrow-left-short fs-2">
+                </i>
+            </button>
+            </a>
+
             <h5 class="card-title text-center mb-4">Create Product</h5>
+        </div>
+
             <form method="post">
                 {% csrf_token %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
                 <div class="mb-3">
                     <label for="id_name" class="form-label">Name</label>
                     <input type="text" class="form-control" id="id_name" name="name">
@@ -75,7 +98,7 @@
 
                 <div class="mb-3">
                     <label for="id_categories" class="form-label">Categories</label>
-                    <input type="text" class="form-control" id="id_categories" name="categories">
+                    <input type="text" class="form-control" id="id_categories" name="categories"  placeholder="Separated by comma">
                     {% if form.categories.errors %}
                         <div class="text-danger">
                             {{ form.categories.errors }}

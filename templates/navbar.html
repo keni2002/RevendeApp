@@ -11,7 +11,7 @@
                     <a class="nav-link{% if section == 'dashboard' %} active{% endif %} text-white" aria-current="page" href="{% url 'dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link{% if section == 'products' %} active{% endif %}  text-white" href="#">Products</a>
+                    <a class="nav-link{% if section == 'products' %} active{% endif %}  text-white" href="{% url "resell:products" %}">Products</a>
                 </li>
             </ul>
             {% if request.user.is_authenticated %}
