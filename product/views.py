@@ -17,7 +17,6 @@ from django.db.models import Q
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import ProductForm
 
-from django.views.generic.edit import FormView
 # Create your views here.
 @login_required
 def product_list(request, categories_slug=None):
@@ -102,7 +101,7 @@ class ProductCreateView(LoginRequiredMixin,SuccessMessageMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_add.html'
-    success_url = reverse_lazy('resell:products')
+    success_url = reverse_lazy('product:products')
     success_message = "Product was created successfully!"
 
     def form_valid(self, form):
@@ -118,7 +117,7 @@ class ProductUpdateView(SuccessMessageMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_edit.html'
-    success_url = reverse_lazy('resell:products')
+    success_url = reverse_lazy('product:products')
     success_message = "Product was updated successfully!"
 
     def form_valid(self, form):
@@ -139,7 +138,7 @@ class ProductUpdateView(SuccessMessageMixin, UpdateView):
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     template_name = 'products/product_delete.html'
-    success_url = reverse_lazy('resell:products')
+    success_url = reverse_lazy('product:products')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -153,4 +152,5 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     def form_invalid(self, form):
         messages.error(self.request, 'Error deleting product')
         return super().form_invalid(form)
+
 

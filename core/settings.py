@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
-    'resell.apps.ResellConfig',
+    'product.apps.ProductConfig',
+    'customer.apps.CustomerConfig'
     'taggit'
 ]
 

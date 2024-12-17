@@ -84,10 +84,10 @@
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td><a href="{% url "resell:product_detail" product.id %}">{{ product.name }}</a></td>
+                    <td><a href="{% url "product:product_detail" product.id %}">{{ product.name }}</a></td>
                     <td>
                         {% for category in product.categories.all %}
-                            <a href="{% url "resell:product_list_by_category" category.slug %}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
+                            <a href="{% url "product:product_list_by_category" category.slug %}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </td>
                     <td>{{ product.price }} {{ product.currency }}</td>
@@ -101,8 +101,8 @@
                     <td>{{ product.updated }}</td>
                     <td class="actions-column">
                         <a href="#" class="btn btn-secondary btn-sm">Resell</a>
-                        <a href="{% url "resell:product_edit" product.id %}" class="btn btn btn-sm">Edit</a>
-                        <a href="{% url "resell:product_delete" product.id %}" class="btn btn btn-sm">Delete</a>
+                        <a href="{% url "product:product_edit" product.id %}" class="btn btn btn-sm">Edit</a>
+                        <a href="{% url "product:product_delete" product.id %}" class="btn btn btn-sm">Delete</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -138,7 +138,7 @@
     </nav>
 </div>
 <!-- Floating Action Button -->
-<a href="{% url "resell:product_add" %}" class="btn btn-primary btn-lg rounded-circle shadow"
+<a href="{% url "product:product_add" %}" class="btn btn-primary btn-lg rounded-circle shadow"
 style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;">
     <i class="bi bi-plus" style="font-size: 24px;"></i>
 </a>
