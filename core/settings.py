@@ -171,6 +171,7 @@ TEMPLATES = [
     },
 ]
 
-# settings.py
-USD_TO_CUP = 327
-MLC_TO_CUP = 300
+# elTOQUE
+USD_TO_CUP = 325
+MLC_TO_CUP = 270
+EUR_TO_CUP = 335
