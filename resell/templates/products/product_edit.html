@@ -6,7 +6,16 @@
 <div class="container d-flex justify-content-center align-items-start vh-100">
     <div class="card shadow-sm mt-5" style="width: 24rem;">
         <div class="card-body">
-            <h5 class="card-title text-center mb-4">Create Product</h5>
+             <div class="flex-row justify-content-between ">
+            <a href="{% url "resell:products" %}">
+            <button type="button" class="btn btn-light">
+                <i class="bi bi-arrow-left-short fs-2">
+                </i>
+            </button>
+            </a>
+
+            <h5 class="card-title text-center mb-4">Edit Product</h5>
+        </div>
             <form method="post">
                 {% csrf_token %}
 
@@ -87,7 +96,7 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">Create Product</button>
+                    <button type="submit" class="btn btn-primary">Update Product</button>
                 </div>
             </form>
         </div>

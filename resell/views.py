@@ -135,3 +135,22 @@ class ProductUpdateView(SuccessMessageMixin, UpdateView):
         context['formatted_categories'] = ', '.join([tag.name for tag in categories])
         return context
 
+
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
+    model = Product
+    template_name = 'products/product_delete.html'
+    success_url = reverse_lazy('resell:products')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product_name'] = self.get_object().name
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "Product deleted successfully")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Error deleting product')
+        return super().form_invalid(form)
+
