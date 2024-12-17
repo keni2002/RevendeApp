@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Details{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Customer Details</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ customer.name }}</h5>
+            <p class="card-text"><strong>Phone:</strong> {{ customer.phone }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ customer.email }}</p>
+            <a href="{% url 'customer:customer_edit' customer.pk %}" class="btn btn">Edit</a>
+            <a href="{% url 'customer:customer_delete' customer.pk %}" class="btn btn">Delete</a>
+            <a href="{% url 'customer:customer_list' %}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

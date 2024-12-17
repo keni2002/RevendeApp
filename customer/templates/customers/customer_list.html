@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Customers{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-inline-flex justify-content-between w-100 align-items-center">
+        <h2>Customer List</h2>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <form class="form-inline" method="get" action="">
+            <div class="form-group mb-2">
+                <label for="order_by" class="mr-2">Order by:</label>
+                <select class="form-control" name="order_by" id="order_by">
+                    <option value="name" {% if request.GET.order_by == "name" %}selected{% endif %}>Name</option>
+                    <option value="phone" {% if request.GET.order_by == "phone" %}selected{% endif %}>Phone</option>
+                    <option value="email" {% if request.GET.order_by == "email" %}selected{% endif %}>Email</option>
+                    <option value="created" {% if request.GET.order_by == "created" %}selected{% endif %}>Created</option>
+                    <option value="updated" {% if request.GET.order_by == "updated" %}selected{% endif %}>Updated</option>
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="asc" name="ordering" value="asc" {% if request.GET.ordering == "asc" %}checked{% endif %} onclick="ensureSingleCheck(this)">
+                    <label class="form-check-label" for="asc">Ascending</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="desc" name="ordering" value="desc" {% if request.GET.ordering == "desc" %}checked{% endif %} onclick="ensureSingleCheck(this)">
+                    <label class="form-check-label" for="desc">Descending</label>
+                </div>
+            </div>
+            <div class="d-inline-flex w-100 justify-content-between">
+                <button type="submit" class="btn btn-primary mb-2">Sort</button>
+                <a href=""><button type="reset" class="btn btn-secondary mb-2">Reset</button></a>
+            </div>
+        </form>
+
+        <!-- Search Form -->
+        <form class="form-inline" method="get" action="">
+            <div class="form-group mb-2">
+                <input type="text" class="form-control" name="q" placeholder="Search" value="{{ request.GET.q }}">
+            </div>
+            <div class="d-inline-flex w-100 justify-content-between">
+                <button type="submit" class="btn btn-primary mb-2">Search</button>
+                <a href=""><button type="reset" class="btn btn-secondary mb-2">Reset</button></a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td><a href="{% url 'customer:customer_detail' customer.id %}">{{ customer.name }}</a></td>
+                    <td>{{ customer.phone }}</td>
+                    <td>{{ customer.email }}</td>
+                    <td>{{ customer.created }}</td>
+                    <td>{{ customer.updated }}</td>
+                    <td class="actions-column">
+                        <a href="{% url 'customer:customer_edit' customer.id %}" class="btn  btn-sm">Edit</a>
+                        <a href="{% url 'customer:customer_delete' customer.id %}" class="btn btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if customers.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ customers.previous_page_number }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for num in customers.paginator.page_range %}
+                {% if customers.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > customers.number|add:'-5' and num < customers.number|add:'5' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if customers.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ customers.next_page_number }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+<!-- Floating Action Button -->
+<a href="{% url 'customer:customer_create' %}" class="btn btn-primary btn-lg rounded-circle shadow"
+style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;">
+    <i class="bi bi-plus" style="font-size: 24px;"></i>
+</a>
+<script>
+function ensureSingleCheck(element) {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"][name="ordering"]');
+    checkboxes.forEach(function (checkbox) {
+        if (checkbox !== element) checkbox.checked = false;
+    });
+}
+</script>
+{% endblock content %}

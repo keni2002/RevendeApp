@@ -1,5 +1,5 @@
 .expectedprofitcolumn { 
-    background-color: #f0feff !important;  /* Color de fondo suave azul */
+    background-color: #f0feff !important;
 }
 
 
@@ -15,6 +15,7 @@ a:hover {
 /* styles.css */
 
 .actions-column {
-    width: 200px;  /* Ajusta este valor según sea necesario */
+    width: 200px;
 }
+
 

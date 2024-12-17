@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'product.apps.ProductConfig',
-    'customer.apps.CustomerConfig'
+    'customer.apps.CustomerConfig',
     'taggit'
 ]
 
