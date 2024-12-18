@@ -2,7 +2,7 @@
 {% block title %}Products{% endblock title %}
 {% block content %}
 <div class="container mt-4">
- {% if not customers %}
+ {% if not products %}
     <div class="alert alert-warning text-center mt-4">
         <p>No customers found. Please add new Products.</p>
         <a href="{% url 'customer:customer_create' %}"

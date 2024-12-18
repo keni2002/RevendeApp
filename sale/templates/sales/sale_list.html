@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Sales{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Sales List</h2>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <form class="form-inline" method="get" action="">
+            <div class="form-group mb-2">
+                <label for="order_by" class="mr-2">Order by:</label>
+                <select class="form-control" name="order_by" id="order_by">
+                    <option value="customer__name" {% if request.GET.order_by == "customer__name" %}selected{% endif %}>Customer</option>
+                    <option value="created" {% if request.GET.order_by == "created" %}selected{% endif %}>Created</option>
+                    <option value="updated" {% if request.GET.order_by == "updated" %}selected{% endif %}>Updated</option>
+                    <option value="total_price" {% if request.GET.order_by == "total_price" %}selected{% endif %}>Total Price</option>
+                    <option value="total_profit" {% if request.GET.order_by == "total_profit" %}selected{% endif %}>Total Profit</option>
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="asc" name="ordering" value="asc" {% if request.GET.ordering == "asc" %}checked{% endif %} onclick="ensureSingleCheck(this)">
+                    <label class="form-check-label" for="asc">Ascending</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="desc" name="ordering" value="desc" {% if request.GET.ordering == "desc" %}checked{% endif %} onclick="ensureSingleCheck(this)">
+                    <label class="form-check-label" for="desc">Descending</label>
+                </div>
+            </div>
+            <div class="d-inline-flex w-100 justify-content-between">
+                <button type="submit" class="btn btn-primary mb-2">Sort</button>
+                <a href=""><button type="reset" class="btn btn-secondary mb-2">Reset</button></a>
+            </div>
+        </form>
+
+        <!-- Search Form -->
+        <form class="form-inline" method="get" action="">
+            <div class="form-group mb-2">
+                <input type="text" class="form-control" name="q" placeholder="Search" value="{{ request.GET.q }}">
+            </div>
+            <div class="d-inline-flex w-100 justify-content-between">
+                <button type="submit" class="btn btn-primary mb-2">Search</button>
+                <a href=""><button type="reset" class="btn btn-secondary mb-2">Reset</button></a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Products</th>
+                    <th>Customer</th>
+                    <th>Total Price</th>
+                    <th>Total Profit</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if sales %}
+                    {% for sale in sales %}
+                        <tr>
+                            <td>
+                                {% for product in sale.products.all %}
+                                    {{ product.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ sale.customer.name }}</td>
+                             <td>{{ sale.total_price }} CUP</td>
+                            <td>{{ sale.total_profit }} CUP</td>
+                            <td>{{ sale.created }}</td>
+                            <td>{{ sale.updated }}</td>
+
+                            <td class="actions-column">
+{#                                <a href="{% url "sales:sale_detail" sale.id %}" class="btn btn-info btn-sm">Details</a>#}
+{#                                <a href="{% url "sales:sale_edit" sale.id %}" class="btn btn-warning btn-sm">Edit</a>#}
+{#                                <a href="{% url "sales:sale_delete" sale.id %}" class="btn btn-danger btn-sm">Delete</a>#}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No sales found. <a href="{% url 'sales:sale_create' %}">Add a new sale</a> <i class="bi bi-arrow-right"></i></td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if sales.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ sales.previous_page_number }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for num in sales.paginator.page_range %}
+                {% if sales.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > sales.number|add:'-5' and num < sales.number|add:'5' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if sales.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ sales.next_page_number }}&items_per_page={{ items_per_page }}&order_by={{ request.GET.order_by }}&ordering={{ request.GET.ordering }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<script>
+function ensureSingleCheck(element) {
+    var checkboxes = document.querySelectorAll('input[type="checkbox"][name="ordering"]');
+    checkboxes.forEach(function (checkbox) {
+        if (checkbox !== element) checkbox.checked = false;
+    });
+}
+</script>
+{% endblock content %}

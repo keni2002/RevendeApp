@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Create Sale{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Create Sale</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="id_customer" class="form-label">Customer</label>
+                                    <select class="form-select" id="id_customer" name="customer">
+                                        {% for customer in customers %}
+                                            <option value="{{ customer.id }}">{{ customer.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <a href="{% url 'customer:customer_create' %}?next=sale_create" class="btn btn-sm btn-outline-primary mt-2">Add new customer</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                    <div id="sale-products-container">
+                                    {{ saleproduct_formset.management_form }}
+                                    {% for form in saleproduct_formset %}
+                                        <div class="sale-product-form mb-3 {% cycle 'bg-light' 'bg-white' %}">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="{{ form.product.id_for_label }}" class="form-label">Product</label>
+                                                    <select class="form-select" name="{{ form.product.name  }}" id="{{ form.product.id_for_label }}">
+                                                        {% for product in products %}
+                                                            <option value="{{ product.id }}" {% if product.id in form.product.value %}selected{% endif %}>{{ product.name }} [ {{ product.remaining_stock }} ]  </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantity</label>
+                                                    <input type="number" class="form-control" name="{{ form.quantity.name }}" id="{{ form.quantity.id_for_label }}" value="{{ form.quantity.value|default_if_none:'' }}">
+                                                </div>
+                                                <div class="col-md-3 mb-3 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSaleProduct(this)">Remove</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <a href="#" id="add-sale-product" class="btn btn-sm btn-outline-primary mt-2">Add another product</a>
+                                <a href="{% url 'product:product_add' %}?next=sale_create" class="btn btn-sm btn-outline-primary mt-2">Add new product</a>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Sale</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('add-sale-product').addEventListener('click', function(event) {
+    event.preventDefault();
+    const container = document.getElementById('sale-products-container');
+    const totalForms = document.querySelectorAll('#sale-products-container .sale-product-form').length;
+    const newFormHtml = container.querySelector('.sale-product-form').outerHTML.replace(/__prefix__/g, totalForms);
+    container.insertAdjacentHTML('beforeend', newFormHtml);
+    document.querySelector('input[name="saleproduct_set-TOTAL_FORMS"]').value = totalForms + 1;
+    colorAlternateRows();
+});
+
+function colorAlternateRows() {
+    const forms = document.querySelectorAll('#sale-products-container .sale-product-form');
+    forms.forEach((form, index) => {
+        if (index % 2 === 0) {
+            form.classList.add('bg-light');
+            form.classList.remove('bg-white');
+        } else {
+            form.classList.add('bg-white');
+            form.classList.remove('bg-light');
+        }
+    });
+}
+
+function removeSaleProduct(button) {
+    const form = button.closest('.sale-product-form');
+    form.remove();
+    const totalForms = document.querySelectorAll('#sale-products-container .sale-product-form').length;
+    document.querySelector('input[name="saleproduct_set-TOTAL_FORMS"]').value = totalForms;
+    colorAlternateRows();
+}
+
+colorAlternateRows();
+</script>
+{% endblock content %}
