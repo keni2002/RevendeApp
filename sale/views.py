@@ -97,7 +97,12 @@ def sale_create(request):
             sale.total_profit = total_profit
             sale.save()
 
+            messages.success(request, "Sale was created successfully!")
             return redirect('sales:sale_list')
+        else:
+            # If the form or formset is not valid, render the form again with errors
+            return render(request, 'sales/sale_form.html',
+                          { 'sale_form': sale_form, 'formset': formset, })
     else:
         sale_form = SaleForm()
         formset = SaleProductFormSet()
