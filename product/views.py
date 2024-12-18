@@ -113,7 +113,7 @@ class ProductCreateView(LoginRequiredMixin,SuccessMessageMixin, CreateView):
         return super().form_invalid(form)
 
 
-class ProductUpdateView(SuccessMessageMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'products/product_edit.html'

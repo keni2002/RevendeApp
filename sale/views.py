@@ -1,3 +1,6 @@
+from django  import forms
+from django.db import transaction
+from django.forms import inlineformset_factory
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -55,70 +58,100 @@ from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Sale, SaleProduct
-from .forms import SaleForm, SaleProductFormSet
+from .forms import SaleForm, SaleProductForm
 from customer.models import Customer
 from product.models import Product
 
-
+@transaction.atomic
 @login_required
 def sale_create(request):
+    SaleProductFormSet = inlineformset_factory(Sale, SaleProduct, form=SaleProductForm, extra=1, can_delete=True)
     if request.method == 'POST':
-        form = SaleForm(request.POST)
-        saleproduct_formset = SaleProductFormSet(request.POST)
+        sale_form = SaleForm(request.POST)
+        formset = SaleProductFormSet(request.POST)
 
-        if form.is_valid() and saleproduct_formset.is_valid():
-            sale = form.save(commit=False)
+        if sale_form.is_valid() and formset.is_valid():
+            sale = sale_form.save(commit=False)
             sale.total_profit = 0
             sale.total_price = 0
             sale.user = request.user
-            sale.save()
+            sale.save()  # Guardar la venta primero
 
-            products = []
-            for sale_product_form in saleproduct_formset:
-                if sale_product_form.cleaned_data:
-                    product = sale_product_form.cleaned_data['product']
-                    quantity = sale_product_form.cleaned_data['quantity']
-                    if product in products:
-                        messages.error(request,
-                                       "You have selected the same product more than once. Please choose unique products.")
-                        return render(request, 'sales/sale_form.html', {
-                            'form': form,
-                            'saleproduct_formset': saleproduct_formset,
-                            'customers': Customer.objects.all(),
-                            'products': Product.objects.all()
-                        })
-                    products.append(product)
-
-            saleproduct_formset.instance = sale
-            saleproduct_formset.save()
-
-            # Actualizar sold_quantity en cada producto
             total_price = 0
             total_profit = 0
-            for sale_product_form in saleproduct_formset:
-                if sale_product_form.cleaned_data:
-                    product = sale_product_form.cleaned_data['product']
-                    quantity = sale_product_form.cleaned_data['quantity']
-                    product.sold_quantity += quantity
-                    product.save()
-                    total_price += sale_product_form.instance.total_price
-                    total_profit += sale_product_form.instance.total_profit
+            products = []
+            for form in formset:
+                if form.cleaned_data:
+                    sale_product = form.save(commit=False)
+                    sale_product.sale = sale
+                    sale_product.save()
+                    total_price += sale_product.total_price
+                    total_profit += sale_product.total_profit
 
+                    # Update sold_quantity
+                    product = sale_product.product
+                    product.sold_quantity += sale_product.quantity
+                    product.save()
+            # Update total price and profit for the sale
             sale.total_price = total_price
             sale.total_profit = total_profit
             sale.save()
 
-            messages.success(request, "Sale was created successfully!")
             return redirect('sales:sale_list')
-        else:
-            messages.error(request, "There was an error creating the sale. Please try again.")
     else:
-        form = SaleForm()
-        saleproduct_formset = SaleProductFormSet()
-
-    return render(request, 'sales/sale_form.html', {
-        'form': form,
-        'saleproduct_formset': saleproduct_formset,
-        'customers': Customer.objects.all(),
-        'products': Product.objects.all(),
-    })
+        sale_form = SaleForm()
+        formset = SaleProductFormSet()
+        return render(request, 'sales/sale_form.html', {
+            'sale_form': sale_form,
+            'formset': formset,
+        })
+    #
+    #
+    #         for sale_product_form in saleproduct_formset:
+    #             if sale_product_form.cleaned_data:
+    #                 product = sale_product_form.cleaned_data['product']
+    #                 quantity = sale_product_form.cleaned_data['quantity']
+    #
+    #                 if product in products:
+    #                     messages.error(request,
+    #                                    "You have selected the same product more than once. Please choose unique products.")
+    #                     return render(request, 'sales/sale_form.html', {
+    #                         'form': form,
+    #                         'saleproduct_formset': saleproduct_formset,
+    #                         'customers': Customer.objects.all(),
+    #                         'products': Product.objects.all()
+    #                     })
+    #
+    #                 products.append(product)
+    #                 total_price += product.price * quantity
+    #                 total_profit += (product.high_price - product.price) * quantity
+    #
+    #                 sale_product = sale_product_form.save(commit=False)
+    #                 sale_product.sale = sale
+    #                 sale_product.save()  # Guardar el producto de la venta
+    #
+    #                 product.sold_quantity += quantity
+    #                 product.save()
+    #
+    #         sale.total_price = total_price
+    #         sale.total_profit = total_profit
+    #         sale.save()
+    #
+    #         messages.success(request, "Sale was created successfully!")
+    #         return redirect('sales:sale_list')
+    #     else:
+    #         if form.errors:
+    #             print("SaleForm errors:", form.errors)
+    #         if saleproduct_formset.errors:
+    #             print("SaleProductFormSet errors:", saleproduct_formset.errors)
+    #         messages.error(request, "There was an error creating the sale. Please try again.")
+    # else:
+    #     form = SaleForm()
+    #     saleproduct_formset = saleproductformset()
+    #
+    # return render(request, 'sales/sale_form.html', {
+    #     'form': form,
+    #     'saleproduct_formset': saleproduct_formset,
+    #     'customers': Customer.objects.all(),
+    #     'products': Product.objects.all(),
+    # })
