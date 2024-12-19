@@ -71,6 +71,16 @@ def sale_create(request):
         formset = SaleProductFormSet(request.POST)
 
         if sale_form.is_valid() and formset.is_valid():
+            for index,form in enumerate(formset):
+                if not form.cleaned_data or not form.cleaned_data['product']:
+                    messages.error(request,f"The form {index+1} is empty.")
+                    return render(request, 'sales/sale_form.html', {
+                        'sale_form': sale_form,
+                        'formset': formset,
+                        'customers': Customer.objects.all(),
+                        'products': Product.objects.all()
+                    })
+
             sale = sale_form.save(commit=False)
             sale.total_profit = 0
             sale.total_price = 0
@@ -81,17 +91,15 @@ def sale_create(request):
             total_profit = 0
             products = []
             for form in formset:
-                if form.cleaned_data:
-                    sale_product = form.save(commit=False)
-                    sale_product.sale = sale
-                    sale_product.save()
-                    total_price += sale_product.total_price
-                    total_profit += sale_product.total_profit
-
+                sale_product = form.save(commit=False)
+                sale_product.sale = sale
+                sale_product.save()
+                total_price += sale_product.total_price
+                total_profit += sale_product.total_profit
                     # Update sold_quantity
-                    product = sale_product.product
-                    product.sold_quantity += sale_product.quantity
-                    product.save()
+                product = sale_product.product
+                product.sold_quantity += sale_product.quantity
+                product.save()
             # Update total price and profit for the sale
             sale.total_price = total_price
             sale.total_profit = total_profit

@@ -19,16 +19,30 @@ class SaleProductForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         }
 
+    def clean_product(self):
+        product = self.cleaned_data.get('product')
+        if product is None:
+            raise forms.ValidationError("No product selected")
+        return product
+
     def clean_quantity(self):
         cd = self.cleaned_data
-        quantity = cd['quantity']
-        product = self.cleaned_data.get('product')
-
-        if quantity and (quantity > product.remaining_stock()):
-            raise forms.ValidationError('Not enough quantity available for this product.')
+        quantity = cd.get('quantity')
+        product = cd.get('product')
+        if product:
+            if quantity and (quantity > product.remaining_stock()):
+                raise forms.ValidationError('Not enough quantity available for this product.')
         if quantity <= 0:
             raise forms.ValidationError('Must be greater than 0')
         return quantity
+
+    # def clean_product(self):
+    #     cd = self.cleaned_data
+    #     product = cd['product']
+    #     print(type(product),product)
+    #     if product:
+    #         raise forms.ValidationError('Product is required')
+    #     return product
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
