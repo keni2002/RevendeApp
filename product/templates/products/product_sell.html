@@ -7,28 +7,42 @@
     <div class="card shadow-sm mt-5" style="width: 36rem;">
         <div class="card-body">
             <h5 class="card-title text-center mb-4">Sell Product</h5>
-            <form method="post">
+            <form method="post" novalidate>
                 {% csrf_token %}
+            <div class="mb-3">
+                            <label for="id_customer" class="form-label">Customer</label>
+                            <div class="d-flex">
+                                <select class="form-select" id="id_customer" name="customer">
+                                    <option value="">Select a customer</option>
+                                    {% for customer in sale_form.customer.field.queryset %}
+                                        <option value="{{ customer.id }}" {% if sale_form.customer.value|stringformat:'s' == customer.id|stringformat:'s' %}selected{% endif %}>
+                                            {{ customer.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="{% url 'customer:customer_create' %}?next=sale_create" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-plus" style="font-size: 18px;"></i>
+                                </a>
+                            </div>
+                            {% for error in sale_form.customer.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
                 <div class="mb-3">
                     <label for="quantity" class="form-label">Quantity to Sell</label>
-                    {{ form.quantity }}
-                    <small class="form-text text-muted">Available stock: {{ remaining_stock }} {{ product.unit }}{{ remaining_stock|pluralize }}</small>
+                    {{ product_form.quantity }}
+                    {% for error in product_form.quantity.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                    <small class="form-text text-muted">Available stock: {{ remaining }} {{ product.unit }}{{ remaining|pluralize }}</small>
                 </div>
-                <div class="mb-3">
-                    <label for="customer" class="form-label">Customer</label>
-                    <div class="d-flex">
-                        {{ form.customer }}
-                        <a href="{% url 'resales:customer_add' %}" class="btn btn-success btn-sm ms-2">
-                            <i class="bi bi-plus"></i>
-                        </a>
-                    </div>
-                </div>
+
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">Sell</button>
                 </div>
             </form>
             <div class="d-grid gap-2 mt-3">
-                <a href="{% url 'resales:products' %}" class="btn btn-secondary">Back</a>
+                <a href="{% url 'product:products' %}" class="btn btn-secondary">Back</a>
             </div>
         </div>
     </div>

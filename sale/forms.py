@@ -36,13 +36,6 @@ class SaleProductForm(forms.ModelForm):
             raise forms.ValidationError('Must be greater than 0')
         return quantity
 
-    # def clean_product(self):
-    #     cd = self.cleaned_data
-    #     product = cd['product']
-    #     print(type(product),product)
-    #     if product:
-    #         raise forms.ValidationError('Product is required')
-    #     return product
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,5 +1,9 @@
-from django.shortcuts import render
+from django.db import transaction
+from django.shortcuts import render, redirect
 from django.shortcuts import render,get_object_or_404
+
+from sale.models import SaleProduct
+from sale.templates.salvadesaleform.forms import SaleForm
 from .models import Product
 from taggit.models import Tag
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -15,7 +19,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import ProductForm
+from .forms import ProductForm, ProductSellForm
+
 
 # Create your views here.
 @login_required
@@ -154,3 +159,62 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
         return super().form_invalid(form)
 
 
+@transaction.atomic
+@login_required
+def sale_create(request,pk):
+    product = get_object_or_404(Product, pk=pk, retailer=request.user)
+    if request.method == 'POST':
+        sale_form = SaleForm(request.POST)
+        product_form = ProductSellForm(request.POST)
+        quantity = 0
+        if request.POST.get('quantity'):
+            quantity = int(request.POST.get('quantity'))
+        else:
+            messages.error(request, "Quantity cannot be empty")
+            return render(request, 'products/product_sell.html', {
+                'product_form': product_form,
+                'sale_form': sale_form,
+                'remaining': product.remaining_stock(),
+            })
+
+
+
+        if quantity > product.remaining_stock():
+            messages.error(request, "You don't have enough stock to sell this product.")
+            return render(request,'products/product_sell.html',{
+                'product_form': product_form,
+                'sale_form': sale_form,
+                'remaining': product.remaining_stock(),
+            })
+
+
+        if sale_form.is_valid() and product_form.is_valid():
+            sale = sale_form.save(commit=False)
+            sale.total_price = 0
+            sale.total_profit = 0
+            sale.user = request.user
+            sale.save()
+
+            sale_product = SaleProduct(product=product, quantity=quantity,sale=sale)
+            sale_product.save()
+            sale.total_price = sale_product.total_price
+            sale.total_profit = sale_product.total_profit
+            sale.save()
+            messages.success(request, "Sale was created successfully!")
+            return redirect('sales:sale_list')
+        else:
+
+            return render(request,'products/product_sell.html',{
+                'product_form': product_form,
+                'sale_form': sale_form,
+                'remaining': product.remaining_stock(),
+            })
+    else:
+        sale_form = SaleForm()
+        product_form = ProductSellForm()
+        return render(request,'products/product_sell.html',{
+            'product_form': product_form,
+            'sale_form': sale_form,
+            'remaining': product.remaining_stock(),
+
+        })

@@ -8,3 +8,4 @@ class ProductForm(admin.ModelAdmin):
      raw_id_fields = ['retailer']
      # exclude = ['sold_quantity']
 
+

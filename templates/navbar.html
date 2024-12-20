@@ -16,6 +16,9 @@
                 <li class="nav-item">
                     <a class="nav-link{% if section == 'customers' %} active {% endif %}  text-white" href="{% url "customer:customer_list" %}">Customers</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link{% if section == 'sales' %} active {% endif %}  text-white" href="{% url "sales:sale_list" %}">Sales</a>
+                </li>
             </ul>
             {% if request.user.is_authenticated %}
                 <div class="dropdown">
@@ -34,7 +37,7 @@
                             <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:none;">
                                 {% csrf_token %}
                             </form>
-                            <a class="dropdown-item text-white" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                            <a class="dropdown-item text-white" href="#" onclick="document.getElementById('logout-form').submit();">Logout</a>
                       </li>
                       <!-- Future options can be added here -->
                     </ul>

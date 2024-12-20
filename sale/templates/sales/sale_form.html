@@ -3,40 +3,81 @@
 {% block title %}Create Sale{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h2>Create Sale</h2>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        {{ sale_form.as_p }}
-        <div class="formset">
-            {{ formset.management_form }}
-            {% for form in formset %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        {{ form.non_field_errors }}
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                {{ form.product.label_tag }}
-                                {{ form.product }}
-                                {% for error in form.product.errors %}
-                                    <div class="text-danger">{{ error }}</div>
-                                {% endfor %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-4">Create Sale</h5>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="id_customer" class="form-label">Customer</label>
+                            <div class="d-flex">
+                                <select class="form-select" id="id_customer" name="customer">
+                                    <option value="">Select a customer</option>
+                                    {% for customer in sale_form.customer.field.queryset %}
+                                        <option value="{{ customer.id }}" {% if sale_form.customer.value|stringformat:'s' == customer.id|stringformat:'s' %}selected{% endif %}>
+                                            {{ customer.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <a href="{% url 'customer:customer_create' %}?next=sale_create" class="btn btn-outline-secondary ms-2">
+                                    <i class="bi bi-plus" style="font-size: 18px;"></i>
+                                </a>
                             </div>
-                            <div class="col-md-6">
-                                {{ form.quantity.label_tag }}
-                                {{ form.quantity }}
-                                {% for error in form.quantity.errors %}
-                                    <div class="text-danger">{{ error }}</div>
-                                {% endfor %}
-                            </div>
+                            {% for error in sale_form.customer.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
-                    </div>
+                        <div class="formset">
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        {{ form.non_field_errors }}
+                                        <div class="d-md-inline-flex">
+                                            <div class="w-75 pe-2">
+                                                {{ form.product.label_tag }}
+                                                {{ form.product }}
+                                                {% for error in form.product.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="w-50">
+                                                {{ form.quantity.label_tag }}
+                                                {{ form.quantity }}
+                                                {% for error in form.quantity.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                            <div>
+                                                <label>Actions:</label>
+                                                <div class="d-inline-flex justify-content-center align-items-center">
+
+                                                <a href="{% url 'product:product_add' %}?next=sale_create" class="btn btn-outline-secondary ms-2">
+                                                    <i class="bi bi-plus" style="font-size: 18px;"></i>
+                                                </a>
+                                                    <button type="button" class="btn btn-outline-danger ms-2 remove-form" onclick="removeForm(this)">
+                                                     <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Sale</button>
+                        <button type="button" class="btn btn-secondary" id="add-more">Add More Products</button>
+                    </form>
                 </div>
-            {% endfor %}
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Create Sale</button>
-        <button type="button" class="btn btn-secondary" id="add-more">Add More Products</button>
-    </form>
+    </div>
 </div>
 
 <script>
@@ -57,5 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
         formset.appendChild(newForm);
     }
 });
+
+function removeForm(button) {
+    let formset = document.querySelector('.formset');
+    if (formset.querySelectorAll('.card').length > 1) {
+        button.closest('.card').remove();
+        let formCount = parseInt(document.querySelector('#id_saleproduct_set-TOTAL_FORMS').value) - 1;
+        document.querySelector('#id_saleproduct_set-TOTAL_FORMS').value = formCount;
+    }
+}
 </script>
 {% endblock content %}

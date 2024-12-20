@@ -109,7 +109,7 @@
                     <td>{{ product.created }}</td>
                     <td>{{ product.updated }}</td>
                     <td class="actions-column">
-                        <a href="#" class="btn btn-secondary btn-sm">Resell</a>
+                        <a href="{% url "product:product_shell" product.id %}" class="btn btn-secondary btn-sm">Resell</a>
                         <a href="{% url "product:product_edit" product.id %}" class="btn btn btn-sm">Edit</a>
                         <a href="{% url "product:product_delete" product.id %}" class="btn btn btn-sm">Delete</a>
                     </td>
