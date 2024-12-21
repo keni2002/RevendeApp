@@ -91,7 +91,8 @@ def sale_create(request):
                         'sale_form': sale_form,
                         'formset': formset,
                         'customers': Customer.objects.all(),
-                        'products': Product.objects.all()
+                        'products': Product.objects.all(),
+                        'is_editing':False
                     })
                 if form.cleaned_data['product'] in products_selected:
                     messages.error(request,f"The product {form.cleaned_data['product']} already selected.")
@@ -99,7 +100,8 @@ def sale_create(request):
                         'sale_form': sale_form,
                         'formset': formset,
                         'customers': Customer.objects.all(),
-                        'products': Product.objects.all()
+                        'products': Product.objects.all(),
+                        'is_editing':False
                     })
                 products_selected.append(form.cleaned_data['product'])
 
@@ -132,21 +134,79 @@ def sale_create(request):
         else:
             # If the form or formset is not valid, render the form again with errors
             return render(request, 'sales/sale_form.html',
-                          { 'sale_form': sale_form, 'formset': formset, })
+                          { 'sale_form': sale_form, 'formset': formset,
+                            'is_editing':False
+                            })
     else:
         sale_form = SaleForm()
         formset = SaleProductFormSet()
         return render(request, 'sales/sale_form.html', {
             'sale_form': sale_form,
             'formset': formset,
+            'is_editing': False,
         })
+
+@login_required
+def sale_edit(request, pk):
+    sale = get_object_or_404(Sale, pk=pk, user=request.user)
+    SaleProductFormSet = inlineformset_factory(Sale, SaleProduct, form=SaleProductForm, extra=0, can_delete=True)
+
+    if request.method == 'POST':
+        sale_form = SaleForm(request.POST)
+        formset = SaleProductFormSet(request.POST)
+
+        if sale_form.is_valid() and formset.is_valid():
+            sale = sale_form.save(commit=False)
+            sale.total_profit = 0
+            sale.total_price = 0
+            sale.save()
+
+            total_price = 0
+            total_profit = 0
+            formset.save(commit=False)
+
+            for form in formset:
+                sale_product = form.save(commit=False)
+                sale_product.sale = sale
+                sale_product.save()
+                total_price += sale_product.total_price
+                total_profit += sale_product.total_profit
+                product = sale_product.product
+                product.sold_quantity += sale_product.quantity
+                product.save()
+
+            sale.total_price = total_price
+            sale.total_profit = total_profit
+            sale.save()
+
+            messages.success(request, "Sale was updated successfully!")
+            return redirect('sales:sale_list')
+        else:
+            messages.error(request, "error while updating sale.")
+    else:
+        sale_form = SaleForm(instance=sale)
+        formset = SaleProductFormSet(instance=sale)
+
+    return render(request, 'sales/sale_form.html', {
+        'sale_form': sale_form,
+        'formset': formset,
+        'sale': sale,
+        'is_editing': True
+    })
+
 
 
 @login_required
 def sale_delete(request, pk):
     sale = get_object_or_404(Sale, pk=pk, user=request.user)
     if request.method == 'POST':
+        products  = sale.products.all()
+        for p in products:
+            p.sold_quantity -= get_object_or_404(SaleProduct,product=p,sale=sale).quantity
+            p.save()
+
         sale.delete()
+
         messages.success(request, "The Sale has been deleted successfully!")
         return redirect('sales:sale_list')
     return render(request, 'sales/sale_confirm_delete.html', {'sale': sale})

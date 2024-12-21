@@ -71,7 +71,14 @@
                                 </div>
                             {% endfor %}
                         </div>
-                        <button type="submit" class="btn btn-primary">Create Sale</button>
+                        <button type="submit" class="btn btn-primary">
+                            {% if is_editing %}
+                            Update Sale
+                            {% else %}
+                            Create Sale
+                            {% endif %}
+
+                        </button>
                         <button type="button" class="btn btn-secondary" id="add-more">Add More Products</button>
                     </form>
                 </div>

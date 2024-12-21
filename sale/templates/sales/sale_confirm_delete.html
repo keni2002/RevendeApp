@@ -8,14 +8,14 @@
         <div class="col-12 col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h5 class="card-title mb-4">Eliminar Venta</h5>
-                    <p>¿Estás seguro de que deseas eliminar esta venta?</p>
+                    <h5 class="card-title mb-4">Delete this sale</h5>
+                    <p>Are you sure you want to delete</p>
                     <p>{{ sale }}</p>
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                            <a href="{% url 'sales:sale_list' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <a href="{% url 'sales:sale_list' %}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
