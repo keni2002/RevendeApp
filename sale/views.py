@@ -2,7 +2,7 @@ from django  import forms
 from django.conf import settings
 from django.db import transaction
 from django.forms import inlineformset_factory
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
@@ -141,3 +141,12 @@ def sale_create(request):
             'formset': formset,
         })
 
+
+@login_required
+def sale_delete(request, pk):
+    sale = get_object_or_404(Sale, pk=pk, user=request.user)
+    if request.method == 'POST':
+        sale.delete()
+        messages.success(request, "The Sale has been deleted successfully!")
+        return redirect('sales:sale_list')
+    return render(request, 'sales/sale_confirm_delete.html', {'sale': sale})

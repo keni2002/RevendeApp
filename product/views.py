@@ -218,3 +218,4 @@ def sale_create(request,pk):
             'remaining': product.remaining_stock(),
 
         })
+

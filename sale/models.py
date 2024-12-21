@@ -35,3 +35,5 @@ class SaleProduct(models.Model):
     @property
     def total_profit(self):
         return self.convert_to_cup(self.product.high_price - self.product.price, self.product.currency) * self.quantity
+
+
