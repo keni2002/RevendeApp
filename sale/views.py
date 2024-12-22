@@ -210,3 +210,6 @@ def sale_delete(request, pk):
         messages.success(request, "The Sale has been deleted successfully!")
         return redirect('sales:sale_list')
     return render(request, 'sales/sale_confirm_delete.html', {'sale': sale})
+
+def functionforgreeningithub(request):
+    pass
