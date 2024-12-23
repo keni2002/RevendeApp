@@ -213,3 +213,5 @@ def sale_delete(request, pk):
 
 def functionforgreeningithub(request):
     pass
+def sumarpuntosengithub(request):
+    pass
