@@ -215,3 +215,5 @@ def functionforgreeningithub(request):
     pass
 def sumarpuntosengithub(request):
     pass
+def sumpuntosgit(request):
+    pass
